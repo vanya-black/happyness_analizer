@@ -1,9 +1,8 @@
 from telethon import TelegramClient, sync
 from telethon import errors
-import logging
 
-def telegram_start (session_name, api_id, api_hash):
 
+def telegram_start(session_name, api_id, api_hash):
     """
     Sing-in to telegram
 
@@ -21,8 +20,6 @@ def telegram_start (session_name, api_id, api_hash):
             'last_name' : last name (str)
 
         }
-
-
     """    
     try:
         client = TelegramClient(session_name, api_id, api_hash).start()
@@ -34,22 +31,19 @@ def telegram_start (session_name, api_id, api_hash):
                 'last_name': me.last_name
                }
     except errors.FloodWaitError as e:
-        print('Flood, need waiting',e.message)
+        print('Flood, need waiting', e.message)
         return (None)
     except errors.ApiIdInvalidError:
         print("Unsuccessful sign-in! Wrong API.")
         return (None)
-    except OSError:
+    except ConnectionError:
         print("No internet")
-        return (None)
-    except ConnectionError as e:
-        print("No connection check proxy setting", e.message)
         return (None)
     finally:
          client.disconnect()
 
 
-def get_msgs (session_name, api_id, api_hash,diag_id = None, diag_lim = 0, msg_lim = None, from_user = True, from_group = False, msg_count_lim = None):
+def get_msgs (session_name, api_id, api_hash, diag_lim=0, msg_lim=None, from_user=True, from_group=False, msg_count_lim=None):
 
     """
     Get telegram messages from id or all messages if id is None
@@ -58,8 +52,7 @@ def get_msgs (session_name, api_id, api_hash,diag_id = None, diag_lim = 0, msg_l
         session_name: session name for telegram
         api_id: Telegram Api Id
         api_hash: Telegram Api Hash
-        diag_ig (int)- target dialogue id
-        diag_lim (int)- if diag_id is None, use it to limit receive diag
+        diag_lim (int)- use it to limit receive diag
         msg_lim (int)- msg lim to get in each diag
         from_user (bool) - receive message from  users, not group or channel
         from_group (bool) - receive message from  group, not user or channel
@@ -103,10 +96,10 @@ def get_msgs (session_name, api_id, api_hash,diag_id = None, diag_lim = 0, msg_l
 
     for diag in client.iter_dialogs(limit=diag_lim):
         total = client.get_messages(diag).total
-        print ('Total messges with',diag.name,'is',total)  
-        if (total >= msg_count_lim):  
-            if (((diag.is_user and from_user)  or (diag.is_group and from_group) )
-                and not me.first_name in diag.name):        
+        print('Total messges with', diag.name, 'is', total)
+        if total >= msg_count_lim:
+            if ((diag.is_user and from_user) or (diag.is_group and from_group))\
+                    and me.first_name not in diag.name:
                 try:
                     for msg in client.iter_messages(diag, limit=msg_lim):
                         dest = msg.to_id.to_dict()
@@ -125,15 +118,15 @@ def get_msgs (session_name, api_id, api_hash,diag_id = None, diag_lim = 0, msg_l
                         if status % status_check == 0:
                             print ('...loading {:.2%} messages'.format(status/total))
                     status = 0
-                    print ('Messages get succesfully from',diag.name)
+                    print('Messages get succesfully from',diag.name)
                 except errors.ChatAdminRequiredError as e:
-                    print ('Messages cant get from',diag.name, e.mesasage)
+                    print('Messages cant get from',diag.name, e.mesasage)
                 except errors.FloodWaitError as e:
-                    print ('Messages cant get from',diag.name, e.mesasage)
+                    print('Messages cant get from',diag.name, e.mesasage)
             else:
-                print(diag.name,'is not user or group')
+                print(diag.name, 'is not user or group')
         else:
-            print(diag.name,'had messages less limit')
+            print(diag.name, 'had messages less limit')
                        
     client.disconnect()
     total_msg = len(msgs['id'])
@@ -141,7 +134,7 @@ def get_msgs (session_name, api_id, api_hash,diag_id = None, diag_lim = 0, msg_l
     return msgs    
 
 
-def get_diags (session_name, api_id, api_hash):
+def get_diags(session_name, api_id, api_hash):
     """
     Geting dialogs list
 

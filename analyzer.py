@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from dateutil.relativedelta import relativedelta, MO3
+from dateutil.relativedelta import relativedelta
 
 
 def get_happiness_per_month(data, id):
@@ -20,13 +20,12 @@ def get_happiness_per_month(data, id):
             'percent_hapiness': []
             'sum_hapiness': []
         }
-
-
     """
-    data = data.loc[df.loc[:,'from_id']==id]
-    data = data.sort_values(by = 'datetime').reset_index()
-    first_d = data.loc[0,'datetime'].to_pydatetime().replace(day=1).date()
-    end_d =  data.loc[data.shape[0]-1,'datetime'].to_pydatetime().date()
+
+    data = data.loc[df.loc[:, 'from_id']==id]
+    data = data.sort_values(by='datetime').reset_index()
+    first_d = data.loc[0, 'datetime'].to_pydatetime().replace(day=1).date()
+    end_d =  data.loc[data.shape[0]-1, 'datetime'].to_pydatetime().date()
     curr_d = first_d
     res = {
             'date': [],
@@ -35,8 +34,8 @@ def get_happiness_per_month(data, id):
             'sum_hapiness': [],
            }
     while curr_d < end_d:
-        new_data = data.loc[(curr_d.month == data.loc[:,'datetime'].dt.month) &
-                            (curr_d.year == data.loc[:,'datetime'].dt.year),:]
+        new_data = data.loc[(curr_d.month == data.loc[:, 'datetime'].dt.month) &
+                            (curr_d.year == data.loc[:, 'datetime'].dt.year), :]
         res['date'].append(curr_d)
         res['mean_happiness'].append(new_data['happiness'].mean())
         res['percent_hapiness'].append(new_data.loc[new_data['happiness']!=0,'happiness'].count()
@@ -93,7 +92,7 @@ def get_happiness_per_user(data, diags, id):
     return res
 
 
-def get_happiness_per_hours (data, timezone = 'Europe/Moscow', id):
+def get_happiness_per_hours(data, id, timezone='Europe/Moscow'):
     """
     Getting mean and percen happiness per any hour in day
 
@@ -123,5 +122,4 @@ def get_happiness_per_hours (data, timezone = 'Europe/Moscow', id):
         res['mean_happiness'].append(new_data['happiness'].mean())
         res['percent_happiness'].append(new_data.loc[new_data['happiness']!=0,'happiness'].count()
                                         / new_data.shape[0])
-        
     return res
