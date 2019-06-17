@@ -10,7 +10,7 @@ def get_happiness_per_month(data, id):
 
     Args:
         data (DataFrame) - DataFrame of messages
-        id (int) - user id for analyze
+        id (int) - user id for analyze, if is None use all
 
     Return
         Dict like this
@@ -22,10 +22,11 @@ def get_happiness_per_month(data, id):
         }
     """
 
-    data = data.loc[df.loc[:, 'from_id']==id]
+    if id is None:
+        data = data.loc[data.loc[:, 'from_id'] == id]
     data = data.sort_values(by='datetime').reset_index()
     first_d = data.loc[0, 'datetime'].to_pydatetime().replace(day=1).date()
-    end_d =  data.loc[data.shape[0]-1, 'datetime'].to_pydatetime().date()
+    end_d = data.loc[data.shape[0]-1, 'datetime'].to_pydatetime().date()
     curr_d = first_d
     res = {
             'date': [],
@@ -46,14 +47,12 @@ def get_happiness_per_month(data, id):
 
 
 def get_happiness_per_user(data, diags, id):
-
     """
     Getting mean and percent happiness for each user
 
     Args:
         data (dataframe) - DataFrame of messages
         diags - dict of diags:
-        dict of diags:
         {
             'id':[]
             'name':[]
@@ -80,7 +79,7 @@ def get_happiness_per_user(data, diags, id):
           'mean_happiness': [],
           'percent':[]
           }
-    data = data.loc[df.loc[:,'from_id']==id]      
+    data = data.loc[data.loc[:, 'from_id'] == id]
     df_diags = pd.DataFrame(diags)
     for to_id in data['to_id'].unique():
         new_data = data.loc[data['to_id']==to_id,:].reset_index()
@@ -114,7 +113,7 @@ def get_happiness_per_hours(data, id, timezone='Europe/Moscow'):
             'mean_happiness':[],
             'percent_happiness':[] 
            }
-    data = data.loc[df.loc[:,'from_id']==id] 
+    data = data.loc[data.loc[:,'from_id']==id]
     data['datetime'] = data['datetime'].dt.tz_convert(timezone)
     for hour in range(24):
         new_data = data.loc[data.loc[:,'datetime'].dt.hour == hour,:]

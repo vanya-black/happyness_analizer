@@ -146,21 +146,21 @@ def get_diags(session_name, api_id, api_hash):
     Returns:
         dict of diags:
         {
-            'id':[]
-            'name':[]
-            'total_msgs':[] 
-            'is_user':[]
-            'is_group':[]
-            'is_channel'
-        } 
-    """
-    diags = {
             'id':[],
             'name':[],
             'total_msgs':[],
             'is_user':[],
             'is_group':[],
-            'is_channel':[]
+            'is_channel':[],
+        } 
+    """
+    diags = {
+            'id': [],
+            'name': [],
+            'total_msgs': [],
+            'is_user': [],
+            'is_group': [],
+            'is_channel': []
         } 
     client = TelegramClient(session_name,api_id,api_hash)
     client.connect()
@@ -172,6 +172,5 @@ def get_diags(session_name, api_id, api_hash):
         diags['is_group'].append(diag.is_group)
         diags['is_channel'].append(diag.is_channel)
     client.disconnect()
-    return(diags)
+    return (diags)
 
-               
