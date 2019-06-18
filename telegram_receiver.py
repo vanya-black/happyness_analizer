@@ -12,7 +12,7 @@ def telegram_start(session_name, api_id, api_hash):
         api_hash: Telegram Api Hash
 
     Return:
-        Dictionary with inform of me, if unsucsess return None
+        Dictionary with inform of me, if unsuccess return None
         {
             'id' : id (int)
             'username' : username (str)
@@ -24,8 +24,9 @@ def telegram_start(session_name, api_id, api_hash):
     try:
         client = TelegramClient(session_name, api_id, api_hash).start()
         me = client.get_me()
+        print(me)
         return {
-                'id' : me.id,
+                'id': me.id,
                 'username': me.username,
                 'first_name': me.first_name,
                 'last_name': me.last_name
@@ -96,10 +97,9 @@ def get_msgs (session_name, api_id, api_hash, diag_lim=0, msg_lim=None, from_use
 
     for diag in client.iter_dialogs(limit=diag_lim):
         total = client.get_messages(diag).total
-        print('Total messges with', diag.name, 'is', total)
+        print('Total messages with', diag.name, 'is', total)
         if total >= msg_count_lim:
-            if ((diag.is_user and from_user) or (diag.is_group and from_group))\
-                    and me.first_name not in diag.name:
+            if (diag.is_user and from_user) or (diag.is_group and from_group):
                 try:
                     for msg in client.iter_messages(diag, limit=msg_lim):
                         dest = msg.to_id.to_dict()
@@ -117,26 +117,26 @@ def get_msgs (session_name, api_id, api_hash, diag_lim=0, msg_lim=None, from_use
                         status += 1
                         if status % status_check == 0:
                             print ('...loading {:.2%} messages'.format(status/total))
+                    print('Messages get successfully from', diag.name, status)
                     status = 0
-                    print('Messages get succesfully from',diag.name)
                 except errors.ChatAdminRequiredError as e:
-                    print('Messages cant get from',diag.name, e.mesasage)
+                    print('Messages cant get from', diag.name, e.mesasage)
                 except errors.FloodWaitError as e:
-                    print('Messages cant get from',diag.name, e.mesasage)
+                    print('Messages cant get from', diag.name, e.mesasage)
             else:
                 print(diag.name, 'is not user or group')
         else:
-            print(diag.name, 'had messages less limit')
+            print(diag.name, 'has messages less limit')
                        
     client.disconnect()
     total_msg = len(msgs['id'])
-    print('Total get',total_msg,'messages') 
+    print('Total get', total_msg, 'messages')
     return msgs    
 
 
 def get_diags(session_name, api_id, api_hash):
     """
-    Geting dialogs list
+    Getting dialogs list
 
     Args:
         session_name: session name for telegram
@@ -162,7 +162,7 @@ def get_diags(session_name, api_id, api_hash):
             'is_group': [],
             'is_channel': []
         } 
-    client = TelegramClient(session_name,api_id,api_hash)
+    client = TelegramClient(session_name, api_id, api_hash)
     client.connect()
     for diag in client.iter_dialogs():
         diags['id'].append(diag.id)
@@ -171,6 +171,7 @@ def get_diags(session_name, api_id, api_hash):
         diags['is_user'].append(diag.is_user)
         diags['is_group'].append(diag.is_group)
         diags['is_channel'].append(diag.is_channel)
+        print(diag.name)
     client.disconnect()
     return (diags)
 
