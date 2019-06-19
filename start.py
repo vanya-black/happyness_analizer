@@ -9,7 +9,7 @@ DIAG_LIM = None
 MSG_LIM = None
 MSG_COUNT_LIM = 100
 
-print("Load new messages or using exist? [y/n]:", end=' ')
+print("Load new messages or using exist CSV file? [y/n]:", end=' ')
 comm = input().upper()
 self_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,6 +23,7 @@ while True:
             diags = get_diags(api_id=API_ID, api_hash=API_HASH, session_name=SESSION_NAME)
         else:
             print("Can't sing in to Telegram")
+            break
         df = pd.DataFrame(msgs)
         path_to_csv = self_path + '\\tg_msgs_' + dt.datetime.utcnow().strftime('%H%M%S_%d%m%Y') + '.csv'
         df.to_csv(path_to_csv)
