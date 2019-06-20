@@ -12,10 +12,11 @@ MSG_COUNT_LIM = 100
 print("Load new messages or using exist CSV file? [y/n]:", end=' ')
 comm = input().upper()
 self_path = os.path.dirname(os.path.abspath(__file__))
+me = telegram_start(SESSION_NAME, API_ID, API_HASH)
 
 while True:
     if comm == 'Y':
-        me = telegram_start(SESSION_NAME, API_ID, API_HASH)
+        #me = telegram_start(SESSION_NAME, API_ID, API_HASH)
         print(me['id'])
         if me is not None:
             msgs = get_msgs(SESSION_NAME, API_ID, API_HASH, diag_lim=DIAG_LIM, msg_lim=MSG_LIM,
@@ -26,7 +27,7 @@ while True:
             break
         df = pd.DataFrame(msgs)
         path_to_csv = self_path + '\\tg_msgs_' + dt.datetime.utcnow().strftime('%H%M%S_%d%m%Y') + '.csv'
-        df.to_csv(path_to_csv)
+        df.to_csv(path_to_csv, index=False)
         break
     if comm.upper() == 'N':
         csv_list = list(filter(lambda x: '.csv' in x, os.listdir(self_path)))
@@ -56,13 +57,21 @@ while True:
     if not (comm == 'Y' or comm == 'N'):
         print("Load new messages or using exist? [y/n]:", end=' ')
         comm = input().upper()
+#print(df.head())
+df.loc[:, 'happiness'] = df.loc[:, 'text'].str.count('\)')
 
-print(df.head().T)
+df['datetime'] = pd.to_datetime(df['datetime'])
+
+print(get_happiness_per_month(df, me['id']))
+
+import plotly
+
+print(plotly.__version__)
 
 '''
 df.to_csv(path_to_csv)
 
 
 # add happiness level
-df.loc[:, 'happiness'] = df.loc[:, 'text'].str.count('\)')
+
 '''

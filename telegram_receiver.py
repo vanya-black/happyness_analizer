@@ -24,7 +24,6 @@ def telegram_start(session_name, api_id, api_hash):
     try:
         client = TelegramClient(session_name, api_id, api_hash).start()
         me = client.get_me()
-        print(me)
         return {
                 'id': me.id,
                 'username': me.username,
