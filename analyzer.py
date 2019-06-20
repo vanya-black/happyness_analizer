@@ -17,8 +17,8 @@ def get_happiness_per_month(data, id):
         {
             'date': []
             'mean_happiness': []
-            'percent_hapiness': []
-            'sum_hapiness': []
+            'percent_happiness': []
+            'sum_happiness': []
         }
     """
 
@@ -31,17 +31,16 @@ def get_happiness_per_month(data, id):
     res = {
             'date': [],
             'mean_happiness': [],
-            'percent_hapiness': [],
-            'sum_hapiness': [],
+            'percent_happiness': [],
+            'sum_happiness': [],
            }
     while curr_d < end_d:
         new_data = data.loc[(curr_d.month == data.loc[:, 'datetime'].dt.month) &
                             (curr_d.year == data.loc[:, 'datetime'].dt.year), :]
         res['date'].append(curr_d)
         res['mean_happiness'].append(new_data['happiness'].mean())
-        res['percent_hapiness'].append(new_data.loc[new_data['happiness']!=0,'happiness'].count()
-                                       / new_data.shape[0])
-        res['sum_hapiness'].append(new_data['happiness'].sum())
+        res['percent_happiness'].append(new_data.loc[new_data['happiness'] != 0, 'happiness'].count() / new_data.shape[0])
+        res['sum_happiness'].append(new_data['happiness'].sum())
         curr_d = curr_d + relativedelta(months=+1)
     return res
 
