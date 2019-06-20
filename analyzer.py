@@ -3,6 +3,55 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
 
+def add_happiness(data):
+    """
+    Adding happiness level to data
+    ) = 1 point of happiness
+    😀 = 1 point of happiness
+    😃 = 1 point of happiness
+    😄 = 1 point of happiness
+    😁 = 1 point of happiness
+    😆 = 1 point of happiness
+    😅 = 1 point of happiness
+    🤣 = 1 point of happiness
+    😂 = 1 point of happiness
+    🙂 = 1 point of happiness
+    🙃 = 1 point of happiness
+    😉 = 1 point of happiness
+    😊 = 1 point of happiness
+    😇 = 1 point of happiness
+
+    :param data: dataframe with messages
+
+    :return: data: dataframe with happiness column
+    """
+    weight = {
+        '\\)': 1,
+        '😀': 1,
+        '😃': 1,
+        '😄': 1,
+        '😁': 1,
+        '😆': 1,
+        '😅': 1,
+        '🤣': 1,
+        '😂': 1,
+        '🙂': 1,
+        '🙃': 1,
+        '😉': 1,
+        '😊': 1,
+        '😇': 1
+        }
+
+    data['happiness'] = 0
+
+    for w in weight:
+        if w == ')':
+            data['happiness'] += (data['text'].str.count(w) - data['text'].str.count('\\(')) * weight[w]
+        else:
+            data['happiness'] += data['text'].str.count(w) * weight[w]
+    return data
+
+
 def get_happiness_per_month(data, id):
 
     """
@@ -39,7 +88,8 @@ def get_happiness_per_month(data, id):
                             (curr_d.year == data.loc[:, 'datetime'].dt.year), :]
         res['date'].append(curr_d)
         res['mean_happiness'].append(new_data['happiness'].mean())
-        res['percent_happiness'].append(new_data.loc[new_data['happiness'] != 0, 'happiness'].count() / new_data.shape[0])
+        res['percent_happiness'].append(new_data.loc[new_data['happiness'] != 0, 'happiness'].count()
+                                        / new_data.shape[0])
         res['sum_happiness'].append(new_data['happiness'].sum())
         curr_d = curr_d + relativedelta(months=+1)
     return res
@@ -76,24 +126,24 @@ def get_happiness_per_user(data, diags, id):
           'user_id': [],
           'full_name': [],
           'mean_happiness': [],
-          'percent':[]
+          'percent': []
           }
     if id is not None:
         data = data.loc[data.loc[:, 'from_id'] == id]
     df_diags = pd.DataFrame(diags)
     for to_id in data['to_id'].unique():
-        new_data = data.loc[data['to_id']==to_id,:].reset_index()
+        new_data = data.loc[data['to_id'] == to_id, :].reset_index()
         res['user_id'].append(to_id)
-        res['full_name'].append(df_diags.loc[df_diags['id']==to_id,'name'].iloc[0])
+        res['full_name'].append(df_diags.loc[df_diags['id'] == to_id, 'name'].iloc[0])
         res['mean_happiness'].append(new_data['happiness'].mean())
-        res['percent'].append(new_data.loc[new_data['happiness']!=0,'happiness'].count()
+        res['percent'].append(new_data.loc[new_data['happiness'] != 0, 'happiness'].count()
                               / new_data.shape[0])
     return res
 
 
 def get_happiness_per_hours(data, id, timezone='Europe/Moscow'):
     """
-    Getting mean and percen happiness per any hour in day
+    Getting mean and percent happiness per any hour in day
 
     Args:
         data (dataframe) - DataFrame of messages

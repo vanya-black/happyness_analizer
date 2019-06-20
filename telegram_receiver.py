@@ -172,5 +172,4 @@ def get_diags(session_name, api_id, api_hash):
         diags['is_channel'].append(diag.is_channel)
         print(diag.name)
     client.disconnect()
-    return (diags)
-
+    return diags
