@@ -7,9 +7,8 @@ import datetime as dt
 import plotly as py
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
+import numpy as np
 
-
-print([1,2,3]*10)
 
 DIAG_LIM = None
 MSG_LIM = None
@@ -100,28 +99,80 @@ perc_trace = go.Scatter(x=hourly['hour'],
 
 d = [mean_trace, perc_trace]
 py.offline.plot(d, filename='my_hourly_happiness.html', auto_open=True)
-print(df_diag)
-print(df_diag.info())
+
 diags = df_diag.to_dict()
 
-user_rate = get_happiness_per_user(df, diags, me['id'])
-print(user_rate)
-trace0 = go.Scatter(
-    x=[i for i in range(len(user_rate['user_id']))],
-    y=[1 for i in user_rate['user_id']],
+user_rate = pd.DataFrame(get_happiness_per_user(df, diags, me['id']))
+for user in user_rate['user_id']:
+    user_rate.loc[user_rate['user_id'] == user, 'mean_happiness_to_me'] = get_happiness_per_user(df, diags, user)['mean_happiness'][0]
+    user_rate.loc[user_rate['user_id'] == user, 'percent_to_me'] = get_happiness_per_user(df, diags, user)['percent'][0]
+
+
+user_rate.sort_values('mean_happiness', inplace=True)
+
+size = user_rate['mean_happiness'] * 100
+
+
+x = [i for i in range(len(size))]
+
+mean_trace = go.Scatter(
+    x=x,
+    y=size,
     mode='markers',
     text=user_rate['full_name'],
+    name='my_mean',
     marker=dict(
-        size=user_rate['mean_happiness'],
-        sizemode='area',
-        sizeref=2. * max(user_rate['mean_happiness'])/(1),
-        sizemin=2
+        color='rgb(0, 0, 127)',
+        size=size,
     )
 )
 
-data = [trace0]
+size = user_rate['percent'] * 100
+
+perc_trace = go.Scatter(
+    x=x,
+    y=size,
+    mode='markers',
+    text=user_rate['full_name'],
+    name='my_percent',
+    marker=dict(
+        color='rgb(0, 0, 255)',
+        size=size,
+    )
+)
+
+size = user_rate['mean_happiness_to_me'] * 100
+
+mean_to_me_trace = go.Scatter(
+    x=x,
+    y=size,
+    mode='markers',
+    text=user_rate['full_name'],
+    name='to_me_mean',
+    marker=dict(
+        color='rgb(255, 0, 0)',
+        size=size,
+    )
+)
+
+size = user_rate['percent_to_me'] * 100
+
+perc_to_me_trace = go.Scatter(
+    x=x,
+    y=size,
+    mode='markers',
+    text=user_rate['full_name'],
+    name='to_me_percent',
+    marker=dict(
+        color='rgb(127, 0, 0)',
+        size=size,
+    )
+)
+
+data = [mean_trace, perc_trace, mean_to_me_trace, perc_to_me_trace]
 
 py.offline.plot(data, filename='users.html', auto_open=True)
+
 
 # just for fun
 # hist_data = list(filter(lambda x: not math.isnan(x), df['happiness'].tolist()))
