@@ -4,6 +4,8 @@ from telegram_receiver import telegram_start, get_msgs, get_diags
 from analyzer import get_happiness_per_month, get_happiness_per_user, get_happiness_per_hours
 from api import API_HASH, API_ID, SESSION_NAME
 import datetime as dt
+import plotly as py
+import plotly.graph_objs as go
 
 DIAG_LIM = None
 MSG_LIM = None
@@ -62,16 +64,33 @@ df.loc[:, 'happiness'] = df.loc[:, 'text'].str.count('\)')
 
 df['datetime'] = pd.to_datetime(df['datetime'])
 
-print(get_happiness_per_month(df, me['id']))
+monthly = get_happiness_per_month(df, me['id'])
 
-import plotly
+mean_trace = go.Scatter(x=monthly['date'],
+                        y=monthly['mean_happiness'],
+                        name='mean happiness')
 
-print(plotly.__version__)
+perc_trace = go.Scatter(x=monthly['date'],
+                        y=monthly['percent_happiness'],
+                        name='percent happiness')
 
-'''
-df.to_csv(path_to_csv)
+d = [mean_trace, perc_trace]
+py.offline.plot(d, filename='my_monthly_happiness', auto_open=True)
 
+hourly = get_happiness_per_hours(df, me['id'])
 
-# add happiness level
+mean_trace = go.Scatter(x=hourly['hour'],
+                        y=hourly['mean_happiness'],
+                        name='mean happiness')
 
-'''
+perc_trace = go.Scatter(x=hourly['hour'],
+                        y=hourly['percent_happiness'],
+                        name='percent happiness')
+
+# sum_trace = go.Scatter(x=hourly['hour'],
+#                        y=hourly['sum_happiness'],
+#                        name='summary happiness')
+
+d = [mean_trace, perc_trace]
+py.offline.plot(d, filename='my_hourly_happiness', auto_open=True)
+

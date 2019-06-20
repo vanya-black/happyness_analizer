@@ -103,23 +103,26 @@ def get_happiness_per_hours(data, id, timezone='Europe/Moscow'):
     Returns:
         Dict
         {
-            'hours':[0,1,...,23]
+            'hour':[0,1,...,23]
             'mean_happiness':[]
-            'percent_happiness':[]
+            'percent_happiness':[],,,,
+            'sum_happiness': []
         }
     """
     res = {
-            'hours': [],
+            'hour': [],
             'mean_happiness': [],
-            'percent_happiness': []
+            'percent_happiness': [],
+            'sum_happiness': []
            }
     if id is not None:
         data = data.loc[data.loc[:, 'from_id'] == id]
     data['datetime'] = data['datetime'].dt.tz_convert(timezone)
     for hour in range(24):
-        new_data = data.loc[data.loc[:,'datetime'].dt.hour == hour, :]
-        res['hours'].append(hour)
+        new_data = data.loc[data.loc[:, 'datetime'].dt.hour == hour, :]
+        res['hour'].append(hour)
         res['mean_happiness'].append(new_data['happiness'].mean())
         res['percent_happiness'].append(new_data.loc[new_data['happiness'] != 0, 'happiness'].count()
                                         / new_data.shape[0])
+        res['sum_happiness'].append(new_data['happiness'].sum())
     return res
