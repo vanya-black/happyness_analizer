@@ -9,7 +9,7 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 
 
-print('\U0001F618')
+print([1,2,3]*10)
 
 DIAG_LIM = None
 MSG_LIM = None
